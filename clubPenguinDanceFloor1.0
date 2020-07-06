@@ -1,50 +1,107 @@
-//https://www.youtube.com/watch?v=YKMB2HtJZEo
+/*
+* CLUB PENGUIN DANCEFLOOR 2.0
+  * Use the arrow keys to move your penguin around the floor
+  * Continuously Press Space Bar to activate the Dance Floor
+  * Click on a cell to move your penguin to that cell
+  * Enter the correct password to start a penguin party
+*/
 
-void setup() {
-  size(800, 800);
-  stroke(255);
+
+
+int xPenguin, yPenguin;
+boolean lights = true;
+String password = "";
+boolean party = false;
+
+void setup(){
+  size(800,800);
   strokeWeight(3);
-  drawDanceFloorPlease();
+  stroke(255);
+  xPenguin = width/20;
+  yPenguin = height/20;
+  drawGrid();
+  print("\nPassword: ");
 }
 
-void draw() {
-
+void draw(){
+  if(!lights){ //turn the lights off
+    background(0);
+  }
 }
 
-void keyPressed() {
-  drawDanceFloorPlease();
-}
-
-void drawDanceFloorPlease(){
-  for (int x = 0; x < width; x += width/10) {
-    for (int y = 0; y < height; y += height/10) {
-      drawCell(x, y);
+void keyPressed(){
+  //if(key == 'o'){ //turn off the lights
+  //  lights = !lights;
+  //}
+  if(lights){ //Only move if the lights are on
+    penguinStep();
+    if (key == ' '){
+      drawGrid();
+    }
+  }
+  if(keyCode >= 65 && keyCode <= 90){
+    password += key;
+    if(!party) print(key);
+  }
+  if(password.length() == 8){
+    if (checkPassword()){
+      PARTY();
+    }
+    else {
+      println("\nPASSWORD '" + password + "' INCORRECT. PLEASE TRY AGAIN");
+      password = "";
+      print("\nPassword:");
+      key = ' ';
     }
   }
 }
 
-void drawCell(int xpos, int ypos){
-  fill(giveMeAColourPlease());
-  rect(xpos, ypos, width/10, height/10);
-  //drawPenguin(xpos+width/20, ypos+width/20);
+boolean checkPassword(){
+  return password.equals("examtime");
 }
 
-color giveMeAColourPlease(){
-  return color(random(255), random(255), random(255));
+void PARTY(){
+  party = true;
+  drawGrid();
 }
 
+/*
+* When you press the mouse down the penguin location will be moved to that cell
+*/
 void mousePressed(){
-  int x = roundDown(mouseX);
-  int y = roundDown(mouseY);
-  drawCell(x, y);
-  drawPenguin(x+width/20, y+height/20);
+  if(!party){
+    int x = roundDown(mouseX);
+    int y = roundDown(mouseY);
+    drawCell(xPenguin-width/20, yPenguin-height/20); //remove previous penguin
+    xPenguin = x+width/20;
+    yPenguin = y+width/20;
+    drawPenguin(xPenguin, yPenguin);
+  }
 }
 
 int roundDown(int pos){
  return pos - pos%80; 
 }
 
+void drawGrid(){
+  for(int x = 0; x < width; x+= width/10){
+    for(int y = 0; y < height; y+= height/10){
+      drawCell(x, y);
+      if(party){
+        drawPenguin(x+width/20, y+height/20);
+      }
+    }
+  }
+  drawPenguin(xPenguin, yPenguin);
+}
+
+void drawCell(int xPos, int yPos){
+  fill(random(256), random(256), random(256));
+  rect(xPos, yPos, width/10, height/10);
+}
+
 void drawPenguin(int x, int y){
+  drawCell(x - width/20, y - height/20);
   noStroke();
   fill(#FFAC05);
   ellipse(x-10, y+30, 30, 10);//leftfeet
@@ -67,4 +124,24 @@ void drawPenguin(int x, int y){
   triangle(x-4, y-7, x+4, y-7, x, y); //mouth
   stroke(255);
   strokeWeight(3);
+}
+
+color giveMeAColourPlease(){
+  return color(random(255), random(255), random(255));
+}
+
+void penguinStep(){
+ if(keyCode == 37 && !(xPenguin < width/10)){ //left
+    xPenguin -= height/10;
+  }
+  if(keyCode == 38 && !(yPenguin < height/10)){ //up
+    yPenguin -= height/10;
+  }
+  if(keyCode == 39 && !(xPenguin > width-width/10)){ //right
+    xPenguin += height/10;
+  }
+  if(keyCode == 40 && !(yPenguin > height-height/10)){ //down
+    yPenguin += height/10;
+  } 
+  drawGrid();
 }
